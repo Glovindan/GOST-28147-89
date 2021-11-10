@@ -1,3 +1,4 @@
+import {GOST} from "./GOST.js";
 // const text = 234
 // const key = 228
 //
@@ -27,6 +28,85 @@
 
 // const text = "10000110110";
 // console.log(text.length)//11
+//
+// import {CHAR_SIZE} from "./constants.js";
+//
+// function toPseudoBinaryConvert(text) {
+//     const binaryArr = [];
+//     for (let i = 0; i < text.length; i++) {
+//         const binaryString = text.charCodeAt(i).toString(2);
+//         const placeholder = '0'.repeat(CHAR_SIZE - binaryString.length)
+//         binaryArr.push(placeholder + binaryString);
+//     }
+//     return binaryArr
+// }
+//
+// function pseudoBinaryToInt(pseudoBinary) {
+//     return parseInt(pseudoBinary, 2);
+// }
+//
+// const char = 'Ж'
+// const psB = toPseudoBinaryConvert(char);
+// const a = pseudoBinaryToInt(psB[0]);
+// const char1 = String.fromCharCode(a);
+// console.log(psB)
+// console.log(a)
+// console.log(char1)
 
-const char = 'ж'
-console.log(char.charCodeAt(0).toString(2))
+//
+//
+// import {CHAR_SIZE} from "./constants.js";
+// function splitPseudoBinary(pseudoBinary, partsCount) {
+//     const splitBinaryArr = []
+//     const partSize = pseudoBinary.length/partsCount
+//     for (let i = 0; i < partsCount; i++) {
+//         splitBinaryArr.push(pseudoBinary.substr(i, partSize))
+//     }
+//     return splitBinaryArr
+// }
+//
+// function splitKey(binaryKeyArr) {
+//     const keyArr = []
+//     const partsCount = CHAR_SIZE / 8
+//
+//     binaryKeyArr.forEach(binaryKey => {
+//         keyArr.push(...splitPseudoBinary(binaryKey, partsCount))
+//     })
+//
+//     return keyArr
+// }
+//
+// function textToPseudoBinaryArray(text) {
+//     const pseudoBinaryArr = [];
+//     for (let i = 0; i < text.length; i++) {
+//         const pseudoBinary = text.charCodeAt(i).toString(2);
+//         const placeholder = '0'.repeat(CHAR_SIZE - pseudoBinary.length)
+//         pseudoBinaryArr.push(placeholder + pseudoBinary);
+//     }
+//     return pseudoBinaryArr
+// }
+//
+// let message = "Ass"
+//
+// const messageBinaryArray = textToPseudoBinaryArray(message)
+// console.log(messageBinaryArray)
+// const zero = '0'.repeat(CHAR_SIZE)
+//
+// const charsCount = 64 / CHAR_SIZE
+// while(messageBinaryArray.length % charsCount) {
+//     messageBinaryArray.push(zero)
+// }
+//
+// const partsCount = messageBinaryArray.length / charsCount;
+// const messageBinaryArray64 = [];
+// for (let i = 0; i < partsCount; i++) {
+//     messageBinaryArray64.push(messageBinaryArray.slice(i * charsCount, (i + 1) * charsCount))
+// }
+
+
+
+const key = "i_hate_nightmare"
+const gost = new GOST(key)
+gost.encrypt("A")
+
+
