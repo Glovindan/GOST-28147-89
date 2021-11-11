@@ -1,4 +1,4 @@
-import {ADD_MOD, BLOCK_SIZE64, CHAR_SIZE, S_BLOCKS} from "./constants.js";
+import {ADD_MOD, BLOCK_SIZE64, CHAR_SIZE, S_BLOCKS, ROUNDS_COUNT} from "./constants.js";
 
 class GOST {
     //Массив ключей k
@@ -37,7 +37,7 @@ class GOST {
         let answer = "";
         const charsCount = pseudoBinary.length / charSize;
         for (let i = 0; i < charsCount; i++) {
-            answer += String.fromCharCode(this.pseudoBinaryToInt(pseudoBinary.substr(i * charsCount, charsCount)))
+            answer += String.fromCharCode(this.pseudoBinaryToInt(pseudoBinary.substr(i * charSize, charSize)))
         }
         return answer
     }
@@ -117,15 +117,16 @@ class GOST {
         })
 
         //32 раунда херни
-        for (let i = 0; i < 32; i++) {
+        for (let i = 0; i < ROUNDS_COUNT; i++) {
             //Получение ключа Xi
             const xIndex = (i < 24) ? i % this.keyArr.length : 7 - i % this.keyArr.length;
             const X = this.keyArr[xIndex];
 
             //Обход по каждому 64-бит блоку
             for (let j = 0; j < messageBinarySplit32.length; j++) {
-                let buf = messageBinarySplit32[j][0];
-                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], this.f(messageBinarySplit32[j][0],X))//Ai+1 = Bi ^ f(Ai, Xi)
+                let buf = messageBinarySplit32[j][0].toString();
+                const fuckingFuck = this.f(messageBinarySplit32[j][0],X);
+                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], fuckingFuck)//Ai+1 = Bi ^ f(Ai, Xi)
                 messageBinarySplit32[j][1] = buf;//Bi+1 = Ai
             }
         }
@@ -133,25 +134,25 @@ class GOST {
         let answerBinary64 = [];
 
         //Объединиение 32бит блоков
-        messageBinarySplit32.forEach(suka => {
-            answerBinary64.push(suka.join(""));
+        messageBinarySplit32.forEach(jopa => {
+            answerBinary64.push(jopa.join(""));
         })
 
         //Объединение 64бит блоков
         let answerBinary = answerBinary64.join("");
-        // let answer = this.parseTextFromPseudoBinary(answerBinary, CHAR_SIZE)
-        return answerBinary
+        let answer = this.parseTextFromPseudoBinary(answerBinary, CHAR_SIZE)
+        return answer
     }
 
     decrypt(message) {
-        // let messageBinary = this.textToPseudoBinary(message)
-        // const zero = '0'.repeat(CHAR_SIZE)
-        // // Разбить текст на блоки 64 бита
-        // while(messageBinary.length % BLOCK_SIZE64) {
-        //     messageBinary += zero
-        // }
+        let messageBinary = this.textToPseudoBinary(message)
+        const zero = '0'.repeat(CHAR_SIZE)
+        // Разбить текст на блоки 64 бита
+        while(messageBinary.length % BLOCK_SIZE64) {
+            messageBinary += zero
+        }
 
-        let messageBinary = message;
+        // let messageBinary = message;
         const messageBinarySplit64 = this.splitPseudoBinary(messageBinary, messageBinary.length/BLOCK_SIZE64)
 
         //Разбить каждый 64-битный блок текста на две половины по 32 бита T0 = (A0, B0)
@@ -161,24 +162,25 @@ class GOST {
         })
 
         //32 раунда херни
-        for (let i = 0; i < 32; i++) {
+        for (let i = 0; i < ROUNDS_COUNT; i++) {
             const xIndex = (i < 8) ? i % this.keyArr.length : 7 - i % this.keyArr.length;
             const X = this.keyArr[xIndex];
 
             //Обход по каждому 64-бит блоку
             for (let j = 0; j < messageBinarySplit32.length; j++) {
-                const buf = messageBinarySplit32[j][1];
-                messageBinarySplit32[j][1] = this.pseudoXor(messageBinarySplit32[j][1], this.f(messageBinarySplit32[j][0],X))
+                const buf = messageBinarySplit32[j][1].toString();
+                const fuckingFuck = this.f(messageBinarySplit32[j][1],X);
+                messageBinarySplit32[j][1] = this.pseudoXor(messageBinarySplit32[j][0], fuckingFuck)
                 messageBinarySplit32[j][0] = buf;
             }
         }
         let answerBinary64 = [];
-        messageBinarySplit32.forEach(suka => {
-            answerBinary64.push(suka.join(""));
+        messageBinarySplit32.forEach(jopa => {
+            answerBinary64.push(jopa.join(""));
         })
         let answerBinary = answerBinary64.join("");
-        // let answer = this.parseTextFromPseudoBinary(answerBinary, CHAR_SIZE)
-        return answerBinary
+        let answer = this.parseTextFromPseudoBinary(answerBinary, CHAR_SIZE)
+        return answer
     }
 }
 
