@@ -107,6 +107,11 @@ import {GOST} from "./GOST.js";
 
 const key = "i_hate_nightmare"
 const gost = new GOST(key)
-gost.encrypt("A")
+const text = "сук"
+console.log("Сука", gost.textToPseudoBinary(text))
+let ans = gost.encrypt(text)
+console.log("Уебанство",ans)
+let dec = gost.decrypt(ans)
+console.log("Хуйня", dec)
 
 
