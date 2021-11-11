@@ -4,13 +4,11 @@ class GOST {
     //Массив ключей k
     keyArr;
 
-
-    constructor(key) {
+    setKey(key) {
         //Разбить 256бит ключ на 8 32бит ключей k0...k7
         const binaryKey = this.textToPseudoBinary(key);
         this.keyArr = this.splitPseudoBinary(binaryKey, 8);
     }
-
     textToPseudoBinary(text, charSize = CHAR_SIZE) {
         let answer = "";
         for (let i = 0; i < text.length; i++) {
@@ -99,7 +97,8 @@ class GOST {
         return this.shiftLeftPseudo(answer, 11)
     }
 
-    encrypt(message) {
+    encrypt(message, key) {
+        this.setKey(key);
         let messageBinary = this.textToPseudoBinary(message)
 
         //Добить нулями до 64 бит
@@ -125,8 +124,8 @@ class GOST {
             //Обход по каждому 64-бит блоку
             for (let j = 0; j < messageBinarySplit32.length; j++) {
                 let buf = messageBinarySplit32[j][0].toString();
-                const fuckingFuck = this.f(messageBinarySplit32[j][0],X);
-                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], fuckingFuck)//Ai+1 = Bi ^ f(Ai, Xi)
+                const idkHowToName = this.f(messageBinarySplit32[j][0],X);
+                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], idkHowToName)//Ai+1 = Bi ^ f(Ai, Xi)
                 messageBinarySplit32[j][1] = buf;//Bi+1 = Ai
             }
         }
@@ -134,8 +133,8 @@ class GOST {
         let answerBinary64 = [];
 
         //Объединиение 32бит блоков
-        messageBinarySplit32.forEach(jopa => {
-            answerBinary64.push(jopa.join(""));
+        messageBinarySplit32.forEach(block64 => {
+            answerBinary64.push(block64.join(""));
         })
 
         //Объединение 64бит блоков
@@ -144,7 +143,8 @@ class GOST {
         return answer
     }
 
-    decrypt(message) {
+    decrypt(message,key) {
+        this.setKey(key);
         let messageBinary = this.textToPseudoBinary(message)
         const zero = '0'.repeat(CHAR_SIZE)
         // Разбить текст на блоки 64 бита
@@ -169,14 +169,14 @@ class GOST {
             //Обход по каждому 64-бит блоку
             for (let j = 0; j < messageBinarySplit32.length; j++) {
                 const buf = messageBinarySplit32[j][1].toString();
-                const fuckingFuck = this.f(messageBinarySplit32[j][1],X);
-                messageBinarySplit32[j][1] = this.pseudoXor(messageBinarySplit32[j][0], fuckingFuck)
+                const idkHowToName = this.f(messageBinarySplit32[j][1],X);
+                messageBinarySplit32[j][1] = this.pseudoXor(messageBinarySplit32[j][0], idkHowToName)
                 messageBinarySplit32[j][0] = buf;
             }
         }
         let answerBinary64 = [];
-        messageBinarySplit32.forEach(jopa => {
-            answerBinary64.push(jopa.join(""));
+        messageBinarySplit32.forEach(block64 => {
+            answerBinary64.push(block64.join(""));
         })
         let answerBinary = answerBinary64.join("");
         let answer = this.parseTextFromPseudoBinary(answerBinary, CHAR_SIZE)

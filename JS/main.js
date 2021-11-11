@@ -1,12 +1,48 @@
 import {GOST} from "./GOST.js";
+import {CHAR_SIZE} from "./constants.js";
 
-const key = "i_hate_nightmare"
-const gost = new GOST(key)
-const text = "Ебаный рот этого казино"
-console.log("Текст", text)
-let ans = gost.encrypt(text)
-console.log("Зашифровано",ans)
-let dec = gost.decrypt("෣䡍递틕阨螐௅ꋏ䲚深Ფ暩塙꩟⏈ꏋ쾨ᬸ礑꓅㈘")
-console.log("Расшифровано", dec)
+const messageInput = document.getElementById("messageInput")
+const keyInput = document.getElementById("keyInput")
 
+const encryptButton = document.getElementById("encryptButton")
+const decryptButton = document.getElementById("decryptButton")
+const decryptResultButton = document.getElementById("decryptResultButton")
 
+const keyLengthSpan = document.getElementById("keyLengthSpan")
+const result = document.getElementById("result")
+
+const gost = new GOST();
+let outputValue = "";
+
+const keyLength = 256 / CHAR_SIZE;
+keyInput.setAttribute("maxlength", keyLength.toString());
+keyLengthSpan.innerText = keyLength.toString();
+
+const gostFunc = function(gostObj, message, key, isEncrypt, outputNode) {
+    if (key.length < keyLength) {
+        alert("Недостаточный размер ключа")
+        return;
+    }
+
+    let answer = "";
+    if(isEncrypt) {
+        answer = gostObj.encrypt(message, key);
+    } else {
+        answer = gostObj.decrypt(message, key);
+    }
+
+    outputNode.innerText = answer;
+    return answer;
+}
+
+encryptButton.addEventListener("click", ()=> {
+    outputValue = gostFunc(gost, messageInput.value, keyInput.value, true, result)
+})
+
+decryptButton.addEventListener("click", ()=> {
+    outputValue = gostFunc(gost, messageInput.value, keyInput.value, false, result)
+})
+
+decryptResultButton.addEventListener("click", ()=> {
+    outputValue = gostFunc(gost, outputValue, keyInput.value, false, result)
+})

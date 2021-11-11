@@ -6,9 +6,24 @@
     <link rel="stylesheet" href="./CSS/style.css">
 </head>
 <body>
+    <main>
+        <div class="wrapper gray-background">
+            <h1>Ввод ключа длиной <span id="keyLengthSpan"></span> символов:</h1>
+            <input type="text" id="keyInput">
+        </div>
+        <div class="wrapper gray-background">
+            <h1>Ввод сообщения:</h1>
+            <input type="text" id="messageInput">
+            <div class="button" id="encryptButton">Зашифровать</div>
+            <div class="button" id="decryptButton">Расшифровать вставленное</div>
+            <div style="color: red; font-style: italic; font-size: 20px">Вставленный текст может быть искажен и расшифрован неверно</div>
+        </div>
+        <div class="wrapper ass">
+            <h1>Результат:</h1>
+            <div class="result" id="result"></div>
+            <div class="button" id="decryptResultButton">Расшифровать результат</div>
+        </div>
+    </main>
     <script type="module" src="JS/main.js"></script>
-    <input id="inJopa" type="text">
-    <button id="butt">Jopa</button>
-    <div id ="Jopa"></div>
 </body>
 </html>
