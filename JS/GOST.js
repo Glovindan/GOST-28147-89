@@ -11,11 +11,11 @@ class GOST {
         this.keyArr = this.splitPseudoBinary(binaryKey, 8);
     }
 
-    textToPseudoBinary(text) {
+    textToPseudoBinary(text, charSize = CHAR_SIZE) {
         let answer = "";
         for (let i = 0; i < text.length; i++) {
             const pseudoBinary = text.charCodeAt(i).toString(2);
-            const placeholder = '0'.repeat(CHAR_SIZE - pseudoBinary.length)
+            const placeholder = '0'.repeat(charSize - pseudoBinary.length)
             answer += placeholder + pseudoBinary;
         }
         return answer
@@ -44,12 +44,12 @@ class GOST {
 
     //Разделение двоичного представления на partsCount
     splitPseudoBinary(pseudoBinary, partsCount) {
-        const splitBinaryArr = []
+        const pseudoBinarySplit = []
         const partSize = pseudoBinary.length/partsCount
         for (let i = 0; i < partsCount; i++) {
-            splitBinaryArr.push(pseudoBinary.substr(i * partSize, partSize))
+            pseudoBinarySplit.push(pseudoBinary.substr(i * partSize, partSize))
         }
-        return splitBinaryArr
+        return pseudoBinarySplit
     }
 
     pseudoXor(a,b) {
@@ -86,29 +86,27 @@ class GOST {
 
         //Разбить на 8 4х-битовых подпоследовательностей
         const ASplit = this.splitPseudoBinary(binarySum,8);
+        const ASplitMutated = [];
         //Для каждого 4бит блока произвести замену через S-блок
-
         for (let i = 0; i < ASplit.length; i++) {
             const AInt = this.pseudoBinaryToInt(ASplit[i])
-            ASplit[i] = this.intToPseudoBinary(S_BLOCKS[i][AInt],4)
+            ASplitMutated.push(this.intToPseudoBinary(S_BLOCKS[i][AInt],4))
         }
 
         //Объединить блоки в 32 бита
-        let answer = ASplit.join("");
-
+        let answer = ASplitMutated.join("");
         //Сдвиг влево на 11 битов
         return this.shiftLeftPseudo(answer, 11)
     }
 
     encrypt(message) {
         let messageBinary = this.textToPseudoBinary(message)
-        const zero = '0'.repeat(CHAR_SIZE)
 
         //Добить нулями до 64 бит
+        const zero = '0'.repeat(CHAR_SIZE)
         while(messageBinary.length % BLOCK_SIZE64) {
             messageBinary = zero + messageBinary
         }
-
         //Разбить текст на блоки 64 бита
         const messageBinarySplit64 = this.splitPseudoBinary(messageBinary, messageBinary.length/BLOCK_SIZE64)
 
@@ -127,8 +125,8 @@ class GOST {
             //Обход по каждому 64-бит блоку
             for (let j = 0; j < messageBinarySplit32.length; j++) {
                 let buf = messageBinarySplit32[j][0];
-                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], this.f(messageBinarySplit32[j][0],X))
-                messageBinarySplit32[j][1] = buf;
+                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], this.f(messageBinarySplit32[j][0],X))//Ai+1 = Bi ^ f(Ai, Xi)
+                messageBinarySplit32[j][1] = buf;//Bi+1 = Ai
             }
         }
 
@@ -161,6 +159,7 @@ class GOST {
         messageBinarySplit64.forEach(block64 => {
             messageBinarySplit32.push(this.splitPseudoBinary(block64, 2));
         })
+
         //32 раунда херни
         for (let i = 0; i < 32; i++) {
             const xIndex = (i < 8) ? i % this.keyArr.length : 7 - i % this.keyArr.length;
@@ -168,9 +167,9 @@ class GOST {
 
             //Обход по каждому 64-бит блоку
             for (let j = 0; j < messageBinarySplit32.length; j++) {
-                const buf = messageBinarySplit32[j][0];
-                messageBinarySplit32[j][0] = this.pseudoXor(messageBinarySplit32[j][1], this.f(messageBinarySplit32[j][0],X))
-                messageBinarySplit32[j][1] = buf;
+                const buf = messageBinarySplit32[j][1];
+                messageBinarySplit32[j][1] = this.pseudoXor(messageBinarySplit32[j][1], this.f(messageBinarySplit32[j][0],X))
+                messageBinarySplit32[j][0] = buf;
             }
         }
         let answerBinary64 = [];

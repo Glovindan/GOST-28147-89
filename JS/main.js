@@ -107,11 +107,25 @@ import {GOST} from "./GOST.js";
 
 const key = "i_hate_nightmare"
 const gost = new GOST(key)
-const text = "сук"
+const text = "fuck"
 console.log("Сука", gost.textToPseudoBinary(text))
 let ans = gost.encrypt(text)
 console.log("Уебанство",ans)
 let dec = gost.decrypt(ans)
+// let dec = gost.decrypt(ans)
 console.log("Хуйня", dec)
 
+// let input = document.getElementById("inJopa");
+// let butt =  document.getElementById("butt");
+// let outp =  document.getElementById("Jopa");
+//
+// butt.addEventListener("click", () => {
+//     let fuck = input.value.split("\t");
+//     for (let i = 0; i < fuck.length; i++) {
+//         fuck[i] = parseInt(fuck[i],16).toString(10);
+//     }
+//     let el = document.createElement("div");
+//     el.innerText = "[" + fuck.toString() + "],"
+//     outp.appendChild(el);
+// })
 
